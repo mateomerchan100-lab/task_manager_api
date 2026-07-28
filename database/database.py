@@ -1,10 +1,11 @@
 import sqlite3
+from config.config import settings
 
-DATABASE_NAME = "tasks.db"
+
 
 
 def get_connection():
-    conn = sqlite3.connect(DATABASE_NAME)
+    conn = sqlite3.connect(settings.database_name)
     conn.row_factory = sqlite3.Row
     return conn
 
