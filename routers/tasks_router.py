@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from models.task_model import Task, TaskResponse, TaskSingleResponse, TaskListResponse
 from repositories.task_repository import TaskRepository, TaskManager, TaskManagerDict, TaskManagerSQLite
 from services.task_service import TaskService
-
+from auth.security import get_current_user
 
 router = APIRouter()
 
@@ -33,7 +33,8 @@ def get_tasks (service: TaskService = Depends(get_service)):
 @router.post("/tasks", response_model= TaskSingleResponse)
 def add_task(
              task: Task,
-             service: TaskService = Depends(get_service)):
+             service: TaskService = Depends(get_service),
+             current_user: str = Depends(get_current_user)):
 
     
     new_task = service.create_task(task.title)

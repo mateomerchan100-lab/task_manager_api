@@ -4,5 +4,6 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env")
 
     database_name: str
+    secret_key: str
 
 settings = Settings()   
