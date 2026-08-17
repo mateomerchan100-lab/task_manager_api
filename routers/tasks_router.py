@@ -47,7 +47,9 @@ def add_task(
 @router.put("/tasks/{task_id}", response_model= TaskSingleResponse)
 def update_task(
     task_id: int,
-    service : TaskService = Depends(get_service)):
+    service : TaskService = Depends(get_service),
+    current_user: str = Depends(get_current_user)
+    ):
 
     updated_task = service.toggle_task(task_id)
 
@@ -59,4 +61,22 @@ def update_task(
     return {
         "data": updated_task,
         "error": None
+    }
+
+
+@router.delete("/tasks/{task_id}")
+def delete_task(
+    task_id: int,
+    service: TaskService = Depends(get_service),
+    current_user: str = Depends(get_current_user)
+    ):
+
+    deleted_task = service.delete_task(task_id)
+
+    if deleted_task is None:
+        raise HTTPException(status_code=404, detail= ("Task not found"))
+
+    return {
+        "data": deleted_task,
+        
     }

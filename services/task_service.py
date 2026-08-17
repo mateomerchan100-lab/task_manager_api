@@ -14,3 +14,8 @@ class TaskService:
     
     def toggle_task(self, task_id: int):
         return self.repo.toggle(task_id)
+
+    def delete_task(self, task_id: int):
+        return self.repo.delete(task_id)
+
+    

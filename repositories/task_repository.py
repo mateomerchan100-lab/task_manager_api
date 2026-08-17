@@ -11,6 +11,9 @@ class TaskRepository:
     def toggle(self, task_id):
         raise NotImplementedError
 
+    def delete(self, task_id):
+        raise NotImplementedError
+
 class TaskManager(TaskRepository):
     def __init__(self):
         self.tasks = []
@@ -180,4 +183,33 @@ class TaskManagerSQLite(TaskRepository):
             "id": updated_row[0],
             "title": updated_row[1],
             "done": bool(updated_row[2])
+        }
+
+    def delete(self, task_id):
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT done FROM tasks WHERE id = ?",
+            (task_id,)
+        )
+
+        row = cursor.fetchone()
+
+        if not row:
+            conn.close()
+            return None
+
+        cursor.execute(
+            "DELETE FROM tasks WHERE id = ?",
+            (task_id,)
+        )
+
+        conn.commit()
+        conn.close()
+
+        return {
+            "status":"done",
+            "error": None
         }
