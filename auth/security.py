@@ -1,8 +1,10 @@
 from passlib.context import CryptContext
 import jwt
 from config.config import settings
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from jwt.exceptions import PyJWTError
+from datetime import datetime, timedelta, timezone
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login") 
 
@@ -18,11 +20,15 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def create_access_token (username: str) -> str:
-    payload = {"username": username}
+    expire = datetime.now(timezone.utc) + timedelta(minutes=30)
+    payload = {"username": username, "exp":expire}
     token = jwt.encode(payload, settings.secret_key, algorithm="HS256")
     return token
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
-    payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
-    username = payload["username"]
-    return username
+    try:
+        payload = jwt.decode(token, settings.secret_key, algorithms=["HS256"])
+        username = payload["username"]
+        return username
+    except PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")

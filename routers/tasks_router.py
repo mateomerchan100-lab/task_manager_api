@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from models.task_model import Task, TaskResponse, TaskSingleResponse, TaskListResponse
-from repositories.task_repository import TaskRepository, TaskManager, TaskManagerDict, TaskManagerSQLite
+from repositories.task_repository import TaskRepository, TaskManagerSQLite
 from services.task_service import TaskService
 from auth.security import get_current_user
 
@@ -78,5 +78,6 @@ def delete_task(
 
     return {
         "data": deleted_task,
+        "error": None
         
     }

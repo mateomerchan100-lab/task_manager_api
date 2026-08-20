@@ -5,7 +5,7 @@ import sqlite3
 def integrity_error_handler(request: Request, exc: sqlite3.IntegrityError):
     return JSONResponse(
         status_code=409,
-        content={"data":None, "error": "Task already exists"}
+        content={"data":None, "error": "Resource already exists"}
     )
 
 

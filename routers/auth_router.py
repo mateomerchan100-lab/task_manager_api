@@ -15,9 +15,7 @@ def get_user_repository():
 def get_user_service(repo: UserRepository = Depends(get_user_repository)):
     return UserService(repo)
 
-@router.get("/")
-def root():
-    return {"status":"ok"}
+
 
 
 @router.post("/register", response_model= UserResponse)
