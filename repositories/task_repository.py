@@ -1,16 +1,16 @@
 from database.database import get_connection
 
 class TaskRepository:
-    def create(self, title):
+    def create(self, title, owner):
         raise NotImplementedError
 
-    def get_all(self):
+    def get_all(self, owner):
         raise NotImplementedError
 
-    def toggle(self, task_id):
+    def toggle(self, task_id, owner):
         raise NotImplementedError
 
-    def delete(self, task_id):
+    def delete(self, task_id, owner ):
         raise NotImplementedError
     
 class TaskManagerSQLite(TaskRepository):
