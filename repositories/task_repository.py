@@ -14,15 +14,15 @@ class TaskRepository:
         raise NotImplementedError
     
 class TaskManagerSQLite(TaskRepository):
-    def create(self, title):
+    def create(self, title, owner):
 
         conn = get_connection()
         cursor = conn.cursor()
 
         try:
             cursor.execute(
-                "INSERT INTO tasks (title, done) VALUES (?, ?)",
-                (title, False)
+                "INSERT INTO tasks (title, done, owner) VALUES (?, ?, ?)",
+                (title, False, owner)
             )
             conn.commit()
 
@@ -39,14 +39,14 @@ class TaskManagerSQLite(TaskRepository):
         
     
 
-    def get_all(self):
+    def get_all(self, owner):
 
         conn = get_connection()
         cursor = conn.cursor()
 
         
 
-        cursor.execute("SELECT * FROM tasks")
+        cursor.execute("SELECT * FROM tasks WHERE owner =?", (owner, ))
 
         rows = cursor.fetchall()
 
@@ -66,14 +66,14 @@ class TaskManagerSQLite(TaskRepository):
         return tasks
 
 
-    def toggle(self, task_id):
+    def toggle(self, task_id, owner):
         
         conn = get_connection()
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT done FROM tasks WHERE id = ?",
-            (task_id,)
+            "SELECT done FROM tasks WHERE id = ? AND owner = ?",
+            (task_id, owner)
         )
 
         row = cursor.fetchone()
@@ -86,15 +86,15 @@ class TaskManagerSQLite(TaskRepository):
         new_value = not current_value
 
         cursor.execute(
-            "UPDATE tasks SET done = ? WHERE id = ?",
-            (new_value, task_id)
+            "UPDATE tasks SET done = ? WHERE id = ? AND owner = ?",
+            (new_value, task_id, owner)
         )
 
         conn.commit()
 
         cursor.execute(
-            "SELECT id, title, done FROM tasks WHERE id = ?",
-            (task_id,)
+            "SELECT id, title, done FROM tasks WHERE id = ? AND owner = ?",
+            (task_id, owner)
         )
 
         updated_row= cursor.fetchone()
@@ -107,14 +107,14 @@ class TaskManagerSQLite(TaskRepository):
             "done": bool(updated_row[2])
         }
 
-    def delete(self, task_id):
+    def delete(self, task_id, owner):
 
         conn = get_connection()
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT done FROM tasks WHERE id = ?",
-            (task_id,)
+            "SELECT done FROM tasks WHERE id = ? AND owner = ?",
+            (task_id, owner)
         )
 
         row = cursor.fetchone()
@@ -124,8 +124,8 @@ class TaskManagerSQLite(TaskRepository):
             return None
 
         cursor.execute(
-            "DELETE FROM tasks WHERE id = ?",
-            (task_id,)
+            "DELETE FROM tasks WHERE id = ? AND owner = ?",
+            (task_id, owner)
         )
 
         conn.commit()

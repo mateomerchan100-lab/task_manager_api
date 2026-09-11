@@ -6,16 +6,16 @@ class TaskService:
     def __init__(self, repo: TaskRepository):
         self.repo = repo
 
-    def create_task(self, title: str):
-        return self.repo.create(title)
+    def create_task(self, title: str, owner: str):
+        return self.repo.create(title, owner)
         
-    def get_tasks(self):
-        return self.repo.get_all()
+    def get_tasks(self, owner: str):
+        return self.repo.get_all(owner)
     
-    def toggle_task(self, task_id: int):
-        return self.repo.toggle(task_id)
+    def toggle_task(self, task_id: int, owner: str):
+        return self.repo.toggle(task_id, owner)
 
-    def delete_task(self, task_id: int):
-        return self.repo.delete(task_id)
+    def delete_task(self, task_id: int, owner: str):
+        return self.repo.delete(task_id, owner)
 
     

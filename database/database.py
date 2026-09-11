@@ -18,7 +18,8 @@ def init_db():
     CREATE TABLE IF NOT EXISTS tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL UNIQUE,
-        done BOOLEAN NOT NULL
+        done BOOLEAN NOT NULL,
+        owner TEXT NOT NULL
     )
     """)
 

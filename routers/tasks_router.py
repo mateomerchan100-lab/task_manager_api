@@ -21,9 +21,10 @@ def root():
 
 
 @router.get("/tasks", response_model= TaskListResponse)
-def get_tasks (service: TaskService = Depends(get_service)):
+def get_tasks (service: TaskService = Depends(get_service),
+               current_user: str = Depends(get_current_user)):
     
-    tasks = service.get_tasks()
+    tasks = service.get_tasks(current_user)
 
     return {
         "data": tasks,
@@ -37,7 +38,7 @@ def add_task(
              current_user: str = Depends(get_current_user)):
 
     
-    new_task = service.create_task(task.title)
+    new_task = service.create_task(task.title, current_user)
 
     return  {
         "data": new_task,
@@ -51,7 +52,7 @@ def update_task(
     current_user: str = Depends(get_current_user)
     ):
 
-    updated_task = service.toggle_task(task_id)
+    updated_task = service.toggle_task(task_id, current_user)
 
     if updated_task is None:
         raise HTTPException(status_code=404, detail=("Task not found"))
@@ -71,7 +72,7 @@ def delete_task(
     current_user: str = Depends(get_current_user)
     ):
 
-    deleted_task = service.delete_task(task_id)
+    deleted_task = service.delete_task(task_id, current_user)
 
     if deleted_task is None:
         raise HTTPException(status_code=404, detail= ("Task not found"))
