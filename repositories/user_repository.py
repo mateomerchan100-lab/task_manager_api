@@ -1,4 +1,3 @@
-import sqlite3
 from database.database import get_connection
 
 
@@ -19,7 +18,7 @@ class UserManagerSQLite(UserRepository):
 
         try:
             cursor.execute(
-                "INSERT INTO users (username, password) VALUES (?, ?)",
+                "INSERT INTO users (username, password) VALUES (%s, %s)",
                 (username, password)
             )
             conn.commit()
@@ -36,7 +35,7 @@ class UserManagerSQLite(UserRepository):
 
         try:
             cursor.execute(
-                "SELECT id, username, password FROM users WHERE username =?",
+                "SELECT id, username, password FROM users WHERE username = %s",
                 (username,)
         )
 

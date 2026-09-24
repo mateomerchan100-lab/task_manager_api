@@ -1,12 +1,11 @@
-import sqlite3
+import psycopg2
 from config.config import settings
 
 
 
 
 def get_connection():
-    conn = sqlite3.connect(settings.database_name)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(settings.database_url)
     return conn
 
 
@@ -16,7 +15,7 @@ def init_db():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS tasks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY ,
         title TEXT NOT NULL UNIQUE,
         done BOOLEAN NOT NULL,
         owner TEXT NOT NULL
@@ -26,7 +25,7 @@ def init_db():
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY ,
         username TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL
         )

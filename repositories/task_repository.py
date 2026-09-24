@@ -21,12 +21,12 @@ class TaskManagerSQLite(TaskRepository):
 
         try:
             cursor.execute(
-                "INSERT INTO tasks (title, done, owner) VALUES (?, ?, ?)",
+                "INSERT INTO tasks (title, done, owner) VALUES (%s, %s, %s) RETURNING id",
                 (title, False, owner)
             )
             conn.commit()
 
-            task_id = cursor.lastrowid
+            task_id = cursor.fetchone()[0]
 
             return {"id": task_id,
                     "title":title,
@@ -46,7 +46,7 @@ class TaskManagerSQLite(TaskRepository):
 
         
 
-        cursor.execute("SELECT * FROM tasks WHERE owner =?", (owner, ))
+        cursor.execute("SELECT * FROM tasks WHERE owner = %s", (owner, ))
 
         rows = cursor.fetchall()
 
@@ -72,7 +72,7 @@ class TaskManagerSQLite(TaskRepository):
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT done FROM tasks WHERE id = ? AND owner = ?",
+            "SELECT done FROM tasks WHERE id = %s AND owner = %s",
             (task_id, owner)
         )
 
@@ -86,14 +86,14 @@ class TaskManagerSQLite(TaskRepository):
         new_value = not current_value
 
         cursor.execute(
-            "UPDATE tasks SET done = ? WHERE id = ? AND owner = ?",
+            "UPDATE tasks SET done = %s WHERE id = %s AND owner = %s",
             (new_value, task_id, owner)
         )
 
         conn.commit()
 
         cursor.execute(
-            "SELECT id, title, done FROM tasks WHERE id = ? AND owner = ?",
+            "SELECT id, title, done FROM tasks WHERE id = %s AND owner = %s",
             (task_id, owner)
         )
 
@@ -113,7 +113,7 @@ class TaskManagerSQLite(TaskRepository):
         cursor = conn.cursor()
 
         cursor.execute(
-            "SELECT done FROM tasks WHERE id = ? AND owner = ?",
+            "SELECT done FROM tasks WHERE id = %s AND owner = %s",
             (task_id, owner)
         )
 
@@ -124,7 +124,7 @@ class TaskManagerSQLite(TaskRepository):
             return None
 
         cursor.execute(
-            "DELETE FROM tasks WHERE id = ? AND owner = ?",
+            "DELETE FROM tasks WHERE id = %s AND owner = %s",
             (task_id, owner)
         )
 
