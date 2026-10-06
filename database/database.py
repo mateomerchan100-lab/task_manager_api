@@ -22,6 +22,10 @@ def init_db():
     )
     """)
 
+    cursor.execute("""
+    CREATE INDEX IF NOT EXISTS idx_tasks_owner ON tasks (owner);
+""")
+
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
