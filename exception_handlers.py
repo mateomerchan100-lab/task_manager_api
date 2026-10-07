@@ -1,8 +1,8 @@
 from fastapi import Request
 from fastapi.responses import JSONResponse
-import sqlite3
+import psycopg2
 
-def integrity_error_handler(request: Request, exc: sqlite3.IntegrityError):
+def integrity_error_handler(request: Request, exc: psycopg2.IntegrityError):
     return JSONResponse(
         status_code=409,
         content={"data":None, "error": "Resource already exists"}
