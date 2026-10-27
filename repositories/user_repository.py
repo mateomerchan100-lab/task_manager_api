@@ -1,4 +1,4 @@
-from database.database import get_connection
+from database.database import get_connection, release_connection
 
 
 class UserRepository:
@@ -24,7 +24,7 @@ class UserManagerSQLite(UserRepository):
             conn.commit()
             return {"username":username}
         finally:
-            conn.close()
+            release_connection(conn)
 
 
 
@@ -51,5 +51,5 @@ class UserManagerSQLite(UserRepository):
             }
             
         finally:
-            conn.close()
+            release_connection(conn)
         

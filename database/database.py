@@ -1,12 +1,15 @@
-import psycopg2
+from psycopg2.pool import ThreadedConnectionPool
 from config.config import settings
 
-
+pool = ThreadedConnectionPool(minconn=1, maxconn=10, dsn=settings.database_url)
 
 
 def get_connection():
-    conn = psycopg2.connect(settings.database_url)
-    return conn
+    return pool.getconn()
+
+def release_connection(conn):
+    pool.putconn(conn)
+
 
 
 def init_db():
@@ -37,4 +40,4 @@ def init_db():
     """)
 
     conn.commit()
-    conn.close()
+    release_connection(conn)

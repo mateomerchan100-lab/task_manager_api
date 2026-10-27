@@ -1,4 +1,4 @@
-from database.database import get_connection
+from database.database import get_connection, release_connection
 
 class TaskRepository:
     def create(self, title, owner):
@@ -35,22 +35,24 @@ class TaskManagerSQLite(TaskRepository):
         
         
         finally:
-            conn.close()
+            release_connection(conn)
         
     
 
     def get_all(self, owner):
-
+        
         conn = get_connection()
-        cursor = conn.cursor()
+        try:
+
+            cursor = conn.cursor()
 
         
+            cursor.execute("SELECT * FROM tasks WHERE owner = %s", (owner, ))
 
-        cursor.execute("SELECT * FROM tasks WHERE owner = %s", (owner, ))
+            rows = cursor.fetchall()
 
-        rows = cursor.fetchall()
-
-        conn.close()
+        finally: 
+            release_connection(conn)
 
         tasks = []
 
@@ -61,45 +63,46 @@ class TaskManagerSQLite(TaskRepository):
                 "done": bool(row[2])
             })
 
-        
 
         return tasks
+        
 
 
     def toggle(self, task_id, owner):
         
         conn = get_connection()
-        cursor = conn.cursor()
+        try:
+            cursor = conn.cursor()
 
-        cursor.execute(
-            "SELECT done FROM tasks WHERE id = %s AND owner = %s",
-            (task_id, owner)
-        )
+            cursor.execute(
+                "SELECT done FROM tasks WHERE id = %s AND owner = %s",
+                (task_id, owner)
+            )
 
-        row = cursor.fetchone()
+            row = cursor.fetchone()
 
-        if not row:
-            conn.close()
-            return None
-        
-        current_value = bool(row[0])
-        new_value = not current_value
+            if not row:
+                return None
+            
+            current_value = bool(row[0])
+            new_value = not current_value
 
-        cursor.execute(
-            "UPDATE tasks SET done = %s WHERE id = %s AND owner = %s",
-            (new_value, task_id, owner)
-        )
+            cursor.execute(
+                "UPDATE tasks SET done = %s WHERE id = %s AND owner = %s",
+                (new_value, task_id, owner)
+            )
 
-        conn.commit()
+            conn.commit()
 
-        cursor.execute(
-            "SELECT id, title, done FROM tasks WHERE id = %s AND owner = %s",
-            (task_id, owner)
-        )
+            cursor.execute(
+                "SELECT id, title, done FROM tasks WHERE id = %s AND owner = %s",
+                (task_id, owner)
+            )
 
-        updated_row= cursor.fetchone()
+            updated_row = cursor.fetchone()
 
-        conn.close()
+        finally:
+            release_connection(conn)
 
         return {
             "id": updated_row[0],
@@ -110,26 +113,27 @@ class TaskManagerSQLite(TaskRepository):
     def delete(self, task_id, owner):
 
         conn = get_connection()
-        cursor = conn.cursor()
+        try:
+            cursor = conn.cursor()
 
-        cursor.execute(
-            "SELECT done FROM tasks WHERE id = %s AND owner = %s",
-            (task_id, owner)
-        )
+            cursor.execute(
+                "SELECT done FROM tasks WHERE id = %s AND owner = %s",
+                (task_id, owner)
+            )
 
-        row = cursor.fetchone()
+            row = cursor.fetchone()
 
-        if not row:
-            conn.close()
-            return None
+            if not row:
+                return None
 
-        cursor.execute(
-            "DELETE FROM tasks WHERE id = %s AND owner = %s",
-            (task_id, owner)
-        )
+            cursor.execute(
+                "DELETE FROM tasks WHERE id = %s AND owner = %s",
+                (task_id, owner)
+            )
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+        finally:
+            release_connection(conn)
 
         return {
             "status":"done",
