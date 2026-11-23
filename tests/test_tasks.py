@@ -12,7 +12,7 @@ def test_update_task_not_found():
     response = client.post("/register", json={"username":"user1", "password": "password"})
     login_response = client.post("/login", data={"username": "user1", "password":"password"})
     token = login_response.json()["access_token"]
-    response = client.put("/tasks/99999", headers={"Authorization":f"bearer {token}"})
+    response = client.put("/tasks/99999", json={"done": True}, headers={"Authorization":f"bearer {token}"})
     assert response.status_code == 404
 
 

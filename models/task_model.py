@@ -4,6 +4,9 @@ from typing import Optional, List
 class Task(BaseModel):
     title : str = Field(min_length=1)
 
+class TaskUpdate(BaseModel):
+    done : bool 
+
 
 class TaskResponse(BaseModel):
     id: int

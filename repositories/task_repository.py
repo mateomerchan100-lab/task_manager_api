@@ -7,7 +7,7 @@ class TaskRepository:
     def get_all(self, owner):
         raise NotImplementedError
 
-    def toggle(self, task_id, owner):
+    def update_done(self, task_id, done, owner):
         raise NotImplementedError
 
     def delete(self, task_id, owner ):
@@ -68,47 +68,32 @@ class TaskManagerSQLite(TaskRepository):
         
 
 
-    def toggle(self, task_id, owner):
-        
+    def update_done(self, task_id, done, owner):
+
         conn = get_connection()
         try:
             cursor = conn.cursor()
 
             cursor.execute(
-                "SELECT done FROM tasks WHERE id = %s AND owner = %s",
-                (task_id, owner)
-            )
-
-            row = cursor.fetchone()
-
-            if not row:
-                return None
-            
-            current_value = bool(row[0])
-            new_value = not current_value
-
-            cursor.execute(
-                "UPDATE tasks SET done = %s WHERE id = %s AND owner = %s",
-                (new_value, task_id, owner)
-            )
-
-            conn.commit()
-
-            cursor.execute(
-                "SELECT id, title, done FROM tasks WHERE id = %s AND owner = %s",
-                (task_id, owner)
+                "UPDATE tasks SET done = %s WHERE id = %s AND owner = %s RETURNING id, title, done",
+                (done, task_id, owner)
             )
 
             updated_row = cursor.fetchone()
-
+            conn.commit()
         finally:
             release_connection(conn)
+
+        if updated_row is None:
+            return None
 
         return {
             "id": updated_row[0],
             "title": updated_row[1],
             "done": bool(updated_row[2])
         }
+
+            
 
     def delete(self, task_id, owner):
 

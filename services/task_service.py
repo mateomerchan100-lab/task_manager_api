@@ -12,8 +12,8 @@ class TaskService:
     def get_tasks(self, owner: str):
         return self.repo.get_all(owner)
     
-    def toggle_task(self, task_id: int, owner: str):
-        return self.repo.toggle(task_id, owner)
+    def update_done(self, task_id: int, done: bool, owner: str):
+        return self.repo.update_done(task_id, done, owner)
 
     def delete_task(self, task_id: int, owner: str):
         return self.repo.delete(task_id, owner)

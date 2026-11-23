@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from models.task_model import Task, TaskResponse, TaskSingleResponse, TaskListResponse
+from models.task_model import Task, TaskResponse, TaskSingleResponse, TaskListResponse, TaskUpdate
 from repositories.task_repository import TaskRepository, TaskManagerSQLite
 from services.task_service import TaskService
 from auth.security import get_current_user
@@ -48,11 +48,12 @@ def add_task(
 @router.put("/tasks/{task_id}", response_model= TaskSingleResponse)
 def update_task(
     task_id: int,
+    task_update: TaskUpdate,
     service : TaskService = Depends(get_service),
     current_user: str = Depends(get_current_user)
     ):
 
-    updated_task = service.toggle_task(task_id, current_user)
+    updated_task = service.update_done(task_id, task_update.done, current_user)
 
     if updated_task is None:
         raise HTTPException(status_code=404, detail=("Task not found"))
