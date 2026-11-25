@@ -54,3 +54,15 @@ def test_update_task_is_idempotent():
 
     assert second_put.status_code == 200
     assert second_put.json()["data"]["done"] == True
+
+
+def test_get_all_tasks():
+    response = client.post("/register", json={"username":"user_get_all_test", "password":"password"})
+    login_response = client.post("/login", data={"username":"user_get_all_test", "password":"password"})
+    token = login_response.json()["access_token"]
+    create_first_task = client.post("/tasks", json={"title":"first_task"}, headers={"Authorization":f"bearer {token}"})
+    create_second_task = client.post("/tasks", json={"title":"second_task"}, headers={"Authorization":f"bearer {token}"})
+    get_response = client.get("/tasks", headers={"Authorization":f"bearer {token}"})
+
+    assert get_response.status_code == 200
+    assert len(get_response.json()["data"]) == 2
