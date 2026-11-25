@@ -40,4 +40,17 @@ def test_delete_task():
     assert second_delete.status_code == 404
 
 
-    
+def test_update_task_is_idempotent():
+    response = client.post("/register", json={"username":"user_idempotent", "password":"password"})
+    login_response = client.post("/login", data={"username":"user_idempotent","password":"password"})
+    token = login_response.json()["access_token"]
+    create_task = client.post("/tasks", json={"title":"Idempotent_task"}, headers={"Authorization":f"bearer {token}"})
+    task_id = create_task.json()["data"]["id"]
+    first_put = client.put(f"/tasks/{task_id}", json={"done":True}, headers={"Authorization":f"bearer {token}"})
+    second_put = client.put(f"/tasks/{task_id}", json={"done":True}, headers={"Authorization":f"bearer {token}"})
+
+    assert first_put.status_code == 200
+    assert first_put.json()["data"]["done"] == True
+
+    assert second_put.status_code == 200
+    assert second_put.json()["data"]["done"] == True
