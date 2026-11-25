@@ -47,7 +47,7 @@ class TaskManagerSQLite(TaskRepository):
             cursor = conn.cursor()
 
         
-            cursor.execute("SELECT * FROM tasks WHERE owner = %s", (owner, ))
+            cursor.execute("SELECT id, title, done FROM tasks WHERE owner = %s", (owner, ))
 
             rows = cursor.fetchall()
 
